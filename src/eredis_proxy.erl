@@ -89,6 +89,7 @@ handle_call(connect, _From, State=#state{pid=undefined}) ->
         {ok, Pid} ->
             {reply, {ok, Pid}, State#state{pid = Pid}};
         {error, Error} ->
+            lager:error("start eredis failed, reason: ~p~n", [Error]),
             {reply, {error, Error}, State}
     end;
 
@@ -127,7 +128,7 @@ handle_cast(_Request, State) ->
     {noreply, NewState :: #state{}, timeout() | hibernate} |
     {stop, Reason :: term(), NewState :: #state{}}).
 handle_info({'EXIT', Pid, _}, State=#state{pid=Pid}) ->
-    lager:debug("eredis_proxy recv Pid ~p~n", [Pid]),
+    lager:error("eredis_proxy recv exit siganl Pid ~p~n", [Pid]),
     {noreply, State#state{pid=undefined}};
 
 handle_info(_Info, State) ->
